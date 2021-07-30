@@ -56,7 +56,7 @@ plt.plot(ticks_frame['time'], ticks_frame['bid'], 'b-', label='bid')
  
 # mostramos los rótulos
 plt.legend(loc='upper left')
- 
+
 # añadimos los encabezados
 plt.title('EURAUD ticks')
  
