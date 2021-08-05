@@ -1,3 +1,5 @@
+
+# obtenemos 10 barras de EURUSD H4 a partir del 01.10.2
 from datetime import datetime
 import numpy as np
 import pytz
@@ -15,8 +17,8 @@ print("MetaTrader5 package version: ",mt5.__version__)
 
 pd.set_option('display.max_columns', 500) # cuántas columnas mostramos
 pd.set_option('display.width', 1500)      # anchura máx. del recuadro para la muestra
-# importamos el módulo pytz para trabajar con el huso horario
-
+# importamos el módulo pytz para trabajar con el huso horario TC, para que no se aplique el desplazamiento del huso horario local
+utc_from = datetime.today()
  
 # establecemos la conexión con el terminal MetaTrader 5
 if not mt5.initialize():
@@ -25,9 +27,7 @@ if not mt5.initialize():
  
 # establecemos el huso horario en UTC
 timezone = pytz.timezone("Etc/UTC")
-# creamos el objeto datetime en el huso horario UTC, para que no se aplique el desplazamiento del huso horario local
-utc_from = datetime.today()
-# obtenemos 10 barras de EURUSD H4 a partir del 01.10.2020 en el huso horario UTC
+# creamos el objeto datetime en el huso horario U020 en el huso horario UTC
 rates = mt5.copy_rates_from("EURUSD", mt5.TIMEFRAME_H1, utc_from, 1000)
  
 # finalizamos la conexión con el terminal MetaTrader 5
@@ -69,6 +69,10 @@ axs[0,1].plot(rates_frame["time"],rates_frame["open"],"r--", label="Open")
 axs[0,1].legend(loc='upper left')
 axs[0,1].set_title('EURUSD')
 
+axs[0,2].hist(rates_frame["variacion log open"],bins=100, label="variacion log open")
+axs[0,2].legend(loc='upper left')
+axs[0,2].set_title('EURUSD')
+
 axs[1,0].plot(pos_log["open"],pos_log["variacion log open"],"b.",label="variacion log positiva open")
 axs[1,0].legend(loc='upper left')
 axs[1,0].set_title('EURUSD')
@@ -78,22 +82,11 @@ axs[1,1].legend(loc='upper left')
 axs[1,1].set_title('EURUSD')
 
 axs[1,2].plot(rates_frame["tick_volume"],rates_frame["variacion log open"],"g.",label="tick volume")
-#plt.subplot(311)
-#plt.plot(rates_frame["open"],rates_frame["variacion log open"],"r.", label="variacion log open")
-#plt.title('EURUSD')
-#plt.subplot(312)
-#plt.plot(rates_frame["time"],rates_frame["open"],"r--", label="Open")
-#plt.subplot(313)
-#plt.plot(pos_log["open"],pos_log["variacion log open"],"b.",label="variacion log positiva open") 
-#plt.subplot(221)
-#plt.plot(neg_log["open"],neg_log["variacion log open"],"b.",label="variacion log negativa open") 
-#plt.subplot(222)
-#plt.plot(rates_frame["tick_volume"],rates_frame["variacion log open"],"g.",label="tick volume")
 
-# mostramos los rótulos
+
 plt.legend(loc='upper left')
  
-# añadimos los encabezados
+# añadimos los encabezado
 plt.title('EURUSD')
  
 # mostramos el gráfico
