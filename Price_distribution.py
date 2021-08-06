@@ -79,6 +79,6 @@ Distribution=distribution_df(rates_frame['variacion log open'])
 #print(Distribution)
 print(len(Distribution))
 print(Distribution.head())
-plt.hist(Distribution,100)
+plt.plot(Distribution)
 plt.show()
 
