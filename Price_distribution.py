@@ -64,7 +64,22 @@ def distribution_df(data,parts=100):
     
 
     return dist
+#funcion de impulsos, definimos impulso primeramente como el numero de veces seguidas de las variaciones tanto positivas como negativas 
+def impulse(series):
+    acumulado=0
+     
+    pass
+
+def is_bull(variation):
+    if variation>0:
+        return True
+
+    elif variation<0:
+        return False
+    else: 
+        return None
         
+
 
 
     
@@ -74,7 +89,11 @@ rates_frame = pd.DataFrame(rates)
 rates_frame['time']=pd.to_datetime(rates_frame['time'], unit='s')
 rates_frame.set_index("time")
 rates_frame['variacion log open']=np.log(rates_frame['open'].shift(1) /rates_frame['open'])
+bull=[]
+for i in rates_frame['variacion log open']:
+    bull.append(is_bull(i))
 
+rates_frame['is bull']=bull
 Distribution=distribution_df(rates_frame['variacion log open'])
 #print(Distribution)
 print(len(Distribution))
