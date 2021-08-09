@@ -28,19 +28,28 @@ if not mt5.initialize():
 # establecemos el huso horario en UTC
 timezone = pytz.timezone("Etc/UTC")
 # creamos el objeto datetime en el huso horario U020 en el huso horario UTC
-rates = mt5.copy_rates_from("EURUSD", mt5.TIMEFRAME_H1, utc_from, 1000)
+rates = mt5.copy_rates_from("EURUSD", mt5.TIMEFRAME_H1, utc_from, 10000)
  
 # finalizamos la conexión con el terminal MetaTrader 5
 mt5.shutdown()
+
+def is_bull(variation):
+
+    if variation<0:
+        return False
+
+    elif variation==0: 
+        return None
+
+    return True
+
 # mostramos cada elemento de los datos obtenidos en una nueva línea
 
 
 
 
-
-
 print("Mostramos los datos obtenidos como son")
-for rate in rates[-10:]:
+for rate in rates[:10]:
     print(rate)
  
 # creamos un DataFrame de los datos obtenidos
@@ -50,6 +59,15 @@ rates_frame = pd.DataFrame(rates)
 rates_frame['time']=pd.to_datetime(rates_frame['time'], unit='s')
 rates_frame.set_index("time")
 rates_frame['variacion log open']=np.log(rates_frame['open'].shift(1) /rates_frame['open'])
+##rates_frame['is bull']=is_bull(rates_frame['variacion log open'])
+bull=[]
+for i in rates_frame['variacion log open']:
+    bull.append(is_bull(i))
+
+rates_frame['is bull']=bull
+
+
+
 pos_log=rates_frame[rates_frame['variacion log open']>=0]
 neg_log=rates_frame[rates_frame['variacion log open']<=0]
 # mostramos los datos
@@ -59,7 +77,10 @@ print(rates_frame)
 print("\n Crecimientos \n",pos_log)
 print("\n Decrecimientos \n",neg_log)
 print(rates_frame['variacion log open'].std())
-
+print(rates_frame[rates_frame['variacion log open']>0.006])
+print(rates_frame[rates_frame['variacion log open']<-0.006 ])
+print(neg_log.index)
+print(type(neg_log.index))
 fig,axs=plt.subplots(2,3)
 axs[0,0].plot(rates_frame["open"],rates_frame["variacion log open"],"r.", label="variacion log open")
 axs[0,0].legend(loc='upper left')
