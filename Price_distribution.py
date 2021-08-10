@@ -78,13 +78,11 @@ def is_bull(variation):
         return False
     else: 
         return None
-        
+
 
 
 
     
-
-
 rates_frame = pd.DataFrame(rates)
 rates_frame['time']=pd.to_datetime(rates_frame['time'], unit='s')
 rates_frame.set_index("time")

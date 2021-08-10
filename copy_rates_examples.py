@@ -9,6 +9,7 @@ import matplotlib.pyplot as plt
 from pandas.plotting import register_matplotlib_converters
 register_matplotlib_converters()
 
+
 # mostramos los datos sobre el paquete MetaTrader5
 print("MetaTrader5 package author: ",mt5.__author__)
 print("MetaTrader5 package version: ",mt5.__version__)
@@ -57,14 +58,44 @@ rates_frame = pd.DataFrame(rates)
 # convertimos la hora en segundos al formato datetime
 
 rates_frame['time']=pd.to_datetime(rates_frame['time'], unit='s')
-rates_frame.set_index("time")
-rates_frame['variacion log open']=np.log(rates_frame['open'].shift(1) /rates_frame['open'])
-##rates_frame['is bull']=is_bull(rates_frame['variacion log open'])
+#rates_frame.set_index("time")
+rates_frame['variacion log open']=np.log(rates_frame['open'] /rates_frame['open'].shift(1))
+
+# 
+
 bull=[]
 for i in rates_frame['variacion log open']:
     bull.append(is_bull(i))
 
 rates_frame['is bull']=bull
+
+#Recibe un data frame de velas con las siguientes columnas:
+    # - is bull
+    # - time
+    # - variacion logaritmica
+
+def momentum_df (df, colum= 'variacion log open'): 
+    ret = []
+    count = 1 
+    sum_acumulada = 0
+    fecha_ini = df.iloc[1,0]
+    for i in df:
+        print("----- ",df[i])
+        if is_bull(i[colum]) is is_bull(i[colum].shift(1)):
+            count+=1
+            sum_acumulada += i[colum]
+        else:
+
+            ret.append([fecha_ini, i["time"].shift(1), count, sum_acumulada])
+
+            #despues de depositar en ret
+            fecha_ini = i["time"]
+            count = 1 
+            sum_acumulada = i[colum]
+
+    return pd.DataFrame(ret, columns=["t0","tf","candels","suma acumulada"])
+
+
 
 
 
@@ -74,13 +105,14 @@ neg_log=rates_frame[rates_frame['variacion log open']<=0]
 print("\nMostramos el frame de datos con la información")
 
 print(rates_frame)  
-print("\n Crecimientos \n",pos_log)
-print("\n Decrecimientos \n",neg_log)
-print(rates_frame['variacion log open'].std())
-print(rates_frame[rates_frame['variacion log open']>0.006])
-print(rates_frame[rates_frame['variacion log open']<-0.006 ])
-print(neg_log.index)
-print(type(neg_log.index))
+print(momentum_df(rates_frame))
+# print("\n Crecimientos \n",pos_log)
+# print("\n Decrecimientos \n",neg_log)
+# print(rates_frame['variacion log open'].std())
+# print(rates_frame[rates_frame['variacion log open']>0.006])
+# print(rates_frame[rates_frame['variacion log open']<-0.006 ])
+# print(neg_log.index)
+# print(type(neg_log['variacion log open'].index))
 fig,axs=plt.subplots(2,3)
 axs[0,0].plot(rates_frame["open"],rates_frame["variacion log open"],"r.", label="variacion log open")
 axs[0,0].legend(loc='upper left')
