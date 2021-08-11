@@ -2,6 +2,8 @@
 # obtenemos 10 barras de EURUSD H4 a partir del 01.10.2
 from datetime import datetime
 import numpy as np
+from numpy.core.numeric import NaN
+from numpy.core.records import array
 import pytz
 import MetaTrader5 as mt5
 import pandas as pd
@@ -76,22 +78,24 @@ rates_frame['is bull']=bull
 
 def momentum_df (df, colum= 'variacion log open'): 
     ret = []
-    count = 1 
+    count = 0 
     sum_acumulada = 0
     fecha_ini = df.iloc[1,0]
-    for i in df:
-        print("----- ",df[i])
-        if is_bull(i[colum]) is is_bull(i[colum].shift(1)):
-            count+=1
-            sum_acumulada += i[colum]
-        else:
 
-            ret.append([fecha_ini, i["time"].shift(1), count, sum_acumulada])
+    for i, data in enumerate(df.iloc):
+        if i > 1:    
+            prev_data = df.iloc[i-1]
+            if is_bull(data[colum]) is is_bull(prev_data[colum]):
+                count+=1
+                sum_acumulada += data[colum]
+            else:
 
-            #despues de depositar en ret
-            fecha_ini = i["time"]
-            count = 1 
-            sum_acumulada = i[colum]
+                ret.append([fecha_ini, prev_data["time"], count, sum_acumulada])
+
+                #despues de depositar en ret
+                fecha_ini = data["time"]
+                count = 1 
+                sum_acumulada = data[colum]
 
     return pd.DataFrame(ret, columns=["t0","tf","candels","suma acumulada"])
 
@@ -104,7 +108,7 @@ neg_log=rates_frame[rates_frame['variacion log open']<=0]
 # mostramos los datos
 print("\nMostramos el frame de datos con la información")
 
-print(rates_frame)  
+#print(rates_frame)  
 print(momentum_df(rates_frame))
 # print("\n Crecimientos \n",pos_log)
 # print("\n Decrecimientos \n",neg_log)
