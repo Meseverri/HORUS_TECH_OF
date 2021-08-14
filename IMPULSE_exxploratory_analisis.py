@@ -1,4 +1,3 @@
-
 # obtenemos 10 barras de EURUSD H4 a partir del 01.10.2
 from datetime import datetime
 import numpy as np
@@ -46,15 +45,7 @@ def is_bull(variation):
 
     return True
 
-# mostramos cada elemento de los datos obtenidos en una nueva línea
 
-
-
-
-print("Mostramos los datos obtenidos como son")
-for rate in rates[:10]:
-    print(rate)
- 
 # creamos un DataFrame de los datos obtenidos
 rates_frame = pd.DataFrame(rates)
 # convertimos la hora en segundos al formato datetime
@@ -78,7 +69,7 @@ rates_frame['is bull']=bull
 
 def momentum_df (df, colum= 'variacion log open'): 
     ret = []
-    count = 0 
+    count = 1 
     sum_acumulada = 0
     fecha_ini = df.iloc[1,0]
 
@@ -100,55 +91,51 @@ def momentum_df (df, colum= 'variacion log open'):
     return pd.DataFrame(ret, columns=["t0","tf","candels","suma acumulada"])
 
 
+def distribution_df(data,parts=100):
+    data=data.round(6)
+    minimo=data.min()
+    maximo=data.max()
+    rango=maximo-minimo
+    interval_size=rango/parts
+    Index=[]
+    dist_data=[]
+    
+    for k in range(parts+1):    
+        Index.append(minimo+k*interval_size)
 
+    print("minimo:",minimo)
+    print("maximo:",maximo)
+    print(f"{Index[0]},{Index[-1]}")
+    for i in Index:  
+        count=1
+        a=set(data[i<=data]).intersection(set(data[data<(i+count*interval_size)]))
+        a=list(a)
+        dist_data.append(len(a))
+        
+        count+=1
+    
+    dist=pd.DataFrame(dist_data,index=Index)
+    return dist
 
+EUROUSD_impulse=momentum_df(rates_frame)
+EUROUSD_pos_impulse=EUROUSD_impulse[EUROUSD_impulse["suma acumulada"]>0]
+EUROUSD_neg_impulse=EUROUSD_impulse[EUROUSD_impulse["suma acumulada"]<0]
+#distribution_df() 
+print(EUROUSD_impulse)
+print(EUROUSD_pos_impulse)
+print(rates_frame.iloc[-1])
+print(type(EUROUSD_impulse["suma acumulada"]))
 
-pos_log=rates_frame[rates_frame['variacion log open']>=0]
-neg_log=rates_frame[rates_frame['variacion log open']<=0]
-# mostramos los datos
-print("\nMostramos el frame de datos con la información")
+x=EUROUSD_impulse["suma acumulada"].index
+y=EUROUSD_impulse["suma acumulada"].values
+print("concordancia de tamaños",len(x)==len(y))
+print(type(x))
+print(type(y))
+fig,axs=plt.subplots(1,2)
+axs[0,0].bar(y,label="impulses")
+axs[0,0].set_title('EURUSD impulse')
 
-#print(rates_frame)  
-print(momentum_df(rates_frame))
-# print("\n Crecimientos \n",pos_log)
-# print("\n Decrecimientos \n",neg_log)
-# print(rates_frame['variacion log open'].std())
-# print(rates_frame[rates_frame['variacion log open']>0.006])
-# print(rates_frame[rates_frame['variacion log open']<-0.006 ])
-# print(neg_log.index)
-# print(type(neg_log['variacion log open'].index))
-print(rates_frame[rates_frame["time"]>datetime(2019,5,1)][rates_frame["time"]<datetime(2020,5,1)]["open"])
-fig,axs=plt.subplots(2,3)
-axs[0,0].plot(rates_frame["open"],rates_frame["variacion log open"],"r.", label="variacion log open")
-axs[0,0].legend(loc='upper left')
-axs[0,0].set_title('EURUSD')
-
-axs[0,1].plot(rates_frame[rates_frame["time"]>datetime(2019,5,1)][rates_frame["time"]<datetime(2020,5,1)]["open"],"r-", label="Open")
- axs[0,1].legend(loc='upper left')
-axs[0,1].set_title('EURUSD')
-
-axs[0,2].hist(rates_frame["variacion log open"],bins=100, label="variacion log open")
-axs[0,2].legend(loc='upper left')
-axs[0,2].set_title('EURUSD')
-
-axs[1,0].plot(pos_log["open"],pos_log["variacion log open"],"b.",label="variacion log positiva open")
-axs[1,0].legend(loc='upper left')
-axs[1,0].set_title('EURUSD')
-
-axs[1,1].plot(neg_log["open"],neg_log["variacion log open"],"b.",label="variacion log negativa open")
-axs[1,1].legend(loc='upper left')
-axs[1,1].set_title('EURUSD')
-
-axs[1,2].plot(rates_frame["tick_volume"],rates_frame["variacion log open"],"g.",label="tick volume")
-
-
-plt.legend(loc='upper left')
- 
-# añadimos los encabezado
-plt.title('EURUSD')
- 
-# mostramos el gráfico
+axs[0,1].plot(EUROUSD_impulse["candels"],"r.",label="candels")
+axs[0,1].set_title('EURUSD candels')
+plt.hist2d(EUROUSD_impulse["suma acumulada"],EUROUSD_impulse["candels"],bins=10)
 plt.show()
-
-
- 

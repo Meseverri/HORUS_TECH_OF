@@ -61,14 +61,8 @@ def distribution_df(data,parts=100):
         count+=1
     
     dist=pd.DataFrame(dist_data,index=Index)
-    
-
     return dist
 #funcion de impulsos, definimos impulso primeramente como el numero de veces seguidas de las variaciones tanto positivas como negativas 
-def impulse(series):
-    acumulado=0
-     
-    pass
 
 def is_bull(variation):
     if variation>0:
