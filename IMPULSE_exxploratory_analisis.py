@@ -118,21 +118,24 @@ def distribution_df(data,parts=100):
     return dist
 
 EUROUSD_impulse=momentum_df(rates_frame)
+EUROUSD_impulse.set_index("t0")
+
 EUROUSD_pos_impulse=EUROUSD_impulse[EUROUSD_impulse["suma acumulada"]>0]
 EUROUSD_neg_impulse=EUROUSD_impulse[EUROUSD_impulse["suma acumulada"]<0]
 #distribution_df() 
 print(EUROUSD_impulse)
-print(EUROUSD_pos_impulse)
+
 print(rates_frame.iloc[-1])
 print(type(EUROUSD_impulse["suma acumulada"]))
 
-x=EUROUSD_impulse["suma acumulada"].index
-y=EUROUSD_impulse["suma acumulada"].values
+x=np.array(EUROUSD_impulse["suma acumulada"].values)
+y=EUROUSD_impulse["suma acumulada"]
 print("concordancia de tamaños",len(x)==len(y))
-print(type(x))
+print(x)
 print(type(y))
+
 fig,axs=plt.subplots(1,2)
-axs[0,0].bar(y,label="impulses")
+axs[0,0].plot(EUROUSD_impulse["suma acumulada"],label="impulses")
 axs[0,0].set_title('EURUSD impulse')
 
 axs[0,1].plot(EUROUSD_impulse["candels"],"r.",label="candels")

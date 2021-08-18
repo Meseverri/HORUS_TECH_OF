@@ -124,7 +124,7 @@ axs[0,0].legend(loc='upper left')
 axs[0,0].set_title('EURUSD')
 
 axs[0,1].plot(rates_frame[rates_frame["time"]>datetime(2019,5,1)][rates_frame["time"]<datetime(2020,5,1)]["open"],"r-", label="Open")
- axs[0,1].legend(loc='upper left')
+axs[0,1].legend(loc='upper left')
 axs[0,1].set_title('EURUSD')
 
 axs[0,2].hist(rates_frame["variacion log open"],bins=100, label="variacion log open")
