@@ -39,7 +39,18 @@ for market in market_lists:
 
 mt5.shutdown()
 
-
+print(markets_open.corr().shape)
 print(markets_open.corr())
-plt.matshow(markets_open.corr(), )
+print(markets_open.corr().loc[:,"CADJPY"])
+figure = plt.figure()
+axes = figure.add_subplot(111)
+  
+# using the matshow() function 
+caxes = axes.matshow(markets_open.corr())
+figure.colorbar(caxes)
+  
+axes.set_xticklabels(['']+markets_open.corr().columns)
+axes.set_yticklabels(['']+markets_open.corr().columns)
+
+
 plt.show()

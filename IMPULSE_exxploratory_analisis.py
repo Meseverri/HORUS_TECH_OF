@@ -88,7 +88,7 @@ def momentum_df (df, colum= 'variacion log open'):
                 count = 1 
                 sum_acumulada = data[colum]
 
-    return pd.DataFrame(ret, columns=["t0","tf","candels","suma acumulada"])
+    return pd.DataFrame(np.array(ret), columns=["t0","tf","candels","suma acumulada"])
 
 
 def distribution_df(data,parts=100):
@@ -123,22 +123,25 @@ EUROUSD_impulse.set_index("t0")
 EUROUSD_pos_impulse=EUROUSD_impulse[EUROUSD_impulse["suma acumulada"]>0]
 EUROUSD_neg_impulse=EUROUSD_impulse[EUROUSD_impulse["suma acumulada"]<0]
 #distribution_df() 
-print(EUROUSD_impulse)
-
+print(EUROUSD_impulse.shape,"impulse shape")
+print(np.array(EUROUSD_impulse["candels"].values))
 print(rates_frame.iloc[-1])
-print(type(EUROUSD_impulse["suma acumulada"]))
+print(type(EUROUSD_impulse["suma acumulada"] ))
 
-x=np.array(EUROUSD_impulse["suma acumulada"].values)
+x=np.array(EUROUSD_impulse["candels"].values)
 y=EUROUSD_impulse["suma acumulada"]
 print("concordancia de tamaños",len(x)==len(y))
 print(x)
 print(type(y))
 
-fig,axs=plt.subplots(1,2)
-axs[0,0].plot(EUROUSD_impulse["suma acumulada"],label="impulses")
-axs[0,0].set_title('EURUSD impulse')
+fig,axs=plt.subplots(1,3)
+#axs[0,0].plot(EUROUSD_impulse["suma acumulada"],label="impulses")
+#axs[0,0].set_title('EURUSD impulse')
 
-axs[0,1].plot(EUROUSD_impulse["candels"],"r.",label="candels")
-axs[0,1].set_title('EURUSD candels')
-plt.hist2d(EUROUSD_impulse["suma acumulada"],EUROUSD_impulse["candels"],bins=10)
+#axs[0,1].plot(EUROUSD_impulse["candels"],"r.",label="candels")
+#axs[0,1].set_title('EURUSD candels')
+axs[0,0].plot(EUROUSD_impulse["suma acumulada"])
+axs[0,1].hist(EUROUSD_impulse["candels"].array)
+axs[0,2].hist(EUROUSD_impulse["suma acumulada"].array)
 plt.show()
+
