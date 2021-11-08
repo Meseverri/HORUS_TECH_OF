@@ -65,7 +65,7 @@ rates_frame.set_index(["year","month","day","time"])
 
 print(rates_frame)
 
-print(rates_frame.groupby(["year","month"]).std()["variacion log open"])
+print(rates_frame.groupby(["month"]).std()["variacion log open"])
 
 
 

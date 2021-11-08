@@ -1,5 +1,6 @@
 # obtenemos 10 barras de EURUSD H4 a partir del 01.10.2
 from datetime import datetime
+import statistics as stats
 import numpy as np
 from numpy.core.numeric import NaN
 from numpy.core.records import array
@@ -87,9 +88,9 @@ def momentum_df (df, colum= 'variacion log open'):
                 fecha_ini = data["time"]
                 count = 1 
                 sum_acumulada = data[colum]
+                
 
     return pd.DataFrame(ret, columns=["t0","tf","candels","suma acumulada"])
-
 
 def distribution_df(data,parts=100):
     data=data.round(6)
@@ -118,24 +119,27 @@ def distribution_df(data,parts=100):
     return dist
 
 EUROUSD_impulse=momentum_df(rates_frame)
-EUROUSD_pos_impulse=EUROUSD_impulse[EUROUSD_impulse["suma acumulada"]>0]
-EUROUSD_neg_impulse=EUROUSD_impulse[EUROUSD_impulse["suma acumulada"]<0]
+EUROUSD_pos_impulse=EUROUSD_impulse[EUROUSD_impulse["suma acumulada"]>0].shape
+EUROUSD_neg_impulse=EUROUSD_impulse[EUROUSD_impulse["suma acumulada"]<=0].shape
+EUROUSD_0_CANDELS=EUROUSD_impulse[EUROUSD_impulse["candels"]==2].shape
 #distribution_df() 
 print(EUROUSD_impulse)
 print(EUROUSD_pos_impulse)
+print(EUROUSD_neg_impulse)
 print(rates_frame.iloc[-1])
 print(type(EUROUSD_impulse["suma acumulada"]))
 
-x=EUROUSD_impulse["suma acumulada"].index
-y=EUROUSD_impulse["suma acumulada"].values
-print("concordancia de tamaños",len(x)==len(y))
-print(type(x))
-print(type(y))
-#fig,axs=plt.subplots(1,2)
-#axs[0,0].bar(y,label="impulses")
-#axs[0,0].set_title('EURUSD impulse')
+x=EUROUSD_impulse.loc[:,"suma acumulada"]
+y=EUROUSD_impulse.loc[:,"candels"]
+print(distribution_df(y.values))
 
-#axs[0,1].plot(EUROUSD_impulse["candels"],"r.",label="candels")
-#axs[0,1].set_title('EURUSD candels')
-plt.hist2d(EUROUSD_impulse["suma acumulada"],EUROUSD_impulse["candels"],bins=10000)
-plt.show()
+print("median",stats.median(EUROUSD_impulse["candels"]))
+print(EUROUSD_0_CANDELS)
+fig,axs=plt.subplots(1,2)
+axs[0,0].bar(distribution_df(y),label="impulses")
+axs[0,0].set_title('EURUSD impulse')
+
+axs[0,1].plot(EUROUSD_impulse["candels"],"r.",label="candels")
+axs[0,1].set_title('EURUSD candels')
+#plt.hist2d(EUROUSD_impulse["suma acumulada"],EUROUSD_impulse["candels"],bins=10000)
+#plt.show()
